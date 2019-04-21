@@ -1,0 +1,1 @@
+[{"name": "me", "adress": "Kaluga"}, {"name": "ISreapeRI", "adress": "\u041a\u0430\u043b\u0443\u0433\u0430"}, {"name": "g", "adress": "\u041c\u043e\u0441\u043a\u0432\u0430"}]
