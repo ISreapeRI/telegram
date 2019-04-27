@@ -1,6 +1,6 @@
 import os
 from sys import executable
-from backend import Map
+#from backend import Map
 
 import json
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, Filters, ConversationHandler
@@ -12,7 +12,7 @@ map_keyboard = [['Схема'], ['Спутник'], ['Гибрид']]
 markup_hello = ReplyKeyboardMarkup(hello_keyboard, one_time_keyboard=True)
 markup_map = ReplyKeyboardMarkup(map_keyboard, one_time_keyboard=True)
 
-mapa = Map()
+#mapa = Map()
 
 new_b = {"name": '', "adress": ''}
 
