@@ -116,52 +116,52 @@ def school(bot, update):    #Выдает список школ и учебны�
         update.message.reply_text("Поиск по всем школам и учебным заведениям вашего города:\nhttps://www.google.com/search?q=школы+и+учебные+заведения+{}&oq=школы+и+учебные+заведения+{}&aqs=chrome..69i57j0l5.3288j0j7&sourceid=chrome&ie=UTF-8".format(adress, adress))
         
         
-def maps(bot, update):    #Выдает карту города города, запросив вид карты (схема, спутник, гибрид)
-    global adress    
-    if adress == None:
-        update.message.reply_text("Ввойдите, в систему, чтобы воспользоваться этой командой")
-        return ConversationHandler.END
-    else:
-        update.message.reply_text("Выберите вид карты", reply_markup=markup_map)
-        return 1
+#def maps(bot, update):    #Выдает карту города города, запросив вид карты (схема, спутник, гибрид)
+#    global adress    
+#    if adress == None:
+#        update.message.reply_text("Ввойдите, в систему, чтобы воспользоваться этой командой")
+#        return ConversationHandler.END
+#    else:
+#        update.message.reply_text("Выберите вид карты", reply_markup=markup_map)
+#        return 1
 
 
-def kind(bot, update):
-    global profile
-    global adress    
-    kin = update.message.text
-    if kin == "Схема":
-        mapa.setMode('map')
-        topo = mapa.getObject(adress)
-        mapa.setCenter(topo.getCoords())
-        mapa.render()
-        photo_loader(mapa.render())
-    elif kin == "Спутник":
-        mapa.setMode('sat')
-        topo = mapa.getObject(adress)
-        mapa.setCenter(topo.getCoords())
-        mapa.render()
-        photo_loader(mapa.render())        
-    elif kin == "Гибрид":
-        mapa.setMode('hyb')
-        topo = mapa.getObject(adress)
-        mapa.setCenter(topo.getCoords())
-        mapa.render()
-        photo_loader(mapa.render())        
-    else:
-        update.message.reply_text("Выберите вид карты", reply_markup=markup_map)
-        return 1
+#def kind(bot, update):
+#    global profile
+#    global adress    
+#    kin = update.message.text
+#    if kin == "Схема":
+#        mapa.setMode('map')
+#        topo = mapa.getObject(adress)
+#        mapa.setCenter(topo.getCoords())
+#        mapa.render()
+#        photo_loader(mapa.render())
+#    elif kin == "Спутник":
+#        mapa.setMode('sat')
+#        topo = mapa.getObject(adress)
+#        mapa.setCenter(topo.getCoords())
+#        mapa.render()
+#        photo_loader(mapa.render())        
+#    elif kin == "Гибрид":
+#        mapa.setMode('hyb')
+#        topo = mapa.getObject(adress)
+#        mapa.setCenter(topo.getCoords())
+#        mapa.render()
+#        photo_loader(mapa.render())        
+#    else:
+#        update.message.reply_text("Выберите вид карты", reply_markup=markup_map)
+#        return 1
 
 
-def photo_loader(bot, updater, mapi):
-    bot.sendPhoto(updater.message.chat.id, mapi)
+#def photo_loader(bot, updater, mapi):
+#    bot.sendPhoto(updater.message.chat.id, mapi)
 
 
-def stop_map(bot, update):
-    update.message.reply_text(
-        "вы прервали выбор вида карты", ReplyKeyboardRemove())
-    update.message.text("Чтобы узнать команды для ботма, напишите /help")
-    return ConversationHandler.END
+#def stop_map(bot, update):
+#    update.message.reply_text(
+#        "вы прервали выбор вида карты", ReplyKeyboardRemove())
+#    update.message.text("Чтобы узнать команды для ботма, напишите /help")
+#    return ConversationHandler.END
 
 
 def stop_start(bot, update):    #останавливает регистрацию или вход
@@ -219,14 +219,14 @@ def main(updater):    #основная функция бота
         fallbacks = [CommandHandler('stop', stop_start)]
     )  
     
-    map_conv = ConversationHandler(
-        entry_points = [CommandHandler('map', maps)], 
-        states={ 
-            1: [MessageHandler(Filters.text, kind)]
-        },
-        fallbacks = [CommandHandler('stop', stop_map)]
-        )  
-    dp.add_handler(map_conv)
+    #map_conv = ConversationHandler(
+    #    entry_points = [CommandHandler('map', maps)], 
+    #    states={ 
+    #        1: [MessageHandler(Filters.text, kind)]
+    #    },
+    #    fallbacks = [CommandHandler('stop', stop_map)]
+    #    )  
+    #dp.add_handler(map_conv)
     dp.add_handler(start_conv)
     dp.add_handler(CommandHandler("log_out", log_out))
     dp.add_handler(CommandHandler("cinema", cinema))
