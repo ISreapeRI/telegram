@@ -90,7 +90,8 @@ def log(bot, update):
 
 
 def start_map(bot, update):
-    update.message.reply_text("Я бот-геокодер. Ищу объекты на карте.")
+    update.message.reply_text("Я бот-геокодер. Ищу объекты на карте.", reply_markup=markup_map)
+    return 1
 
 
 # Получаем параметры объекта для рисования карты вокруг него.
@@ -119,8 +120,7 @@ def get_ll_spn(toponym):
 
     return (ll, span)
 
-def geocoder(bot, updater):
-    print(update.message.text)
+def geocoder_map(bot, updater):
     geocoder_uri = geocoder_request_template = "http://geocode-maps.yandex.ru/1.x/"
     response = requests.get(geocoder_uri, params = {
         "format": "json",
@@ -135,7 +135,7 @@ def geocoder(bot, updater):
     # Можно воспользоваться готовой фукнцией,
     # которую предлагалось сделать на уроках, посвященных HTTP-геокодеру.
 
-    static_api_request = "http://static-maps.yandex.ru/1.x/?ll={ll}&spn={spn}&l=sat".format(**locals())
+    static_api_request = "http://static-maps.yandex.ru/1.x/?ll={ll}&spn={spn}&l=map".format(**locals())
 
     bot.sendPhoto(
         updater.message.chat.id,  # Идентификатор чата. Куда посылать картинку.
@@ -143,6 +143,14 @@ def geocoder(bot, updater):
         static_api_request
     )                             
     # Телеграму можно передать прямо ее, не скачивая предварительно карту.
+
+
+def geocoder_sat(bot, updater):
+    pass
+
+
+def geocoder_gip(bot, updater):
+    pass
 
 
 def cinema(bot, update):    #Выдает список кинотеатров города, посредстов поиска в google
@@ -193,6 +201,10 @@ def start(bot, update):    #Выдает список кинотеатров г�
     return 1
 
 
+def check_map(bot, update):
+    pass
+
+
 def check(bot, update):    #Выдает список кинотеатров города, посредстов поиска в google
     if update.message.text == "Регистрация":
         update.message.reply_text("Введите свой будущий никнейм")
@@ -240,7 +252,10 @@ def main(updater):    #основная функция бота
     map_conv = ConversationHandler(
         entry_points = [CommandHandler('map', start_map)], 
         states={ 
-            1: [MessageHandler(Filters.text, geocoder)]
+            1: [MessageHandler(Filters.text, check_map)],
+            2: [MessageHandler(Filters.text, geocoder_map)],
+            3: [MassageHandler(Filters.text, geocoder_sat)],
+            4: [MessageHandler(Filters.text, geocoder_gip)]
         },
         fallbacks = [CommandHandler('stop', stop_map)]
         )  
