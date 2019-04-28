@@ -1,7 +1,6 @@
 import os
-import requests
 from sys import executable
-#from backend import Map
+
 
 import json
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, Filters, ConversationHandler
@@ -89,70 +88,6 @@ def log(bot, update):
     return ConversationHandler.END
 
 
-def start_map(bot, update):
-    update.message.reply_text("Я бот-геокодер. Ищу объекты на карте.", reply_markup=markup_map)
-    return 1
-
-
-# Получаем параметры объекта для рисования карты вокруг него.
-def get_ll_spn(toponym):
-    # Координаты центра топонима:
-    toponym_coodrinates = toponym["Point"]["pos"]
-    # Долгота и Широта :
-    toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
-
-    # Собираем координаты в параметр ll
-    ll = ",".join([toponym_longitude, toponym_lattitude])
-
-    # Рамка вокруг объекта:
-    envelope = toponym["boundedBy"]["Envelope"]
-
-    # левая, нижняя, правая и верхняя границы из координат углов:
-    l,b = envelope["lowerCorner"].split(" ")
-    r,t = envelope["upperCorner"].split(" ")
-  
-    # Вычисляем полуразмеры по вертикали и горизонтали
-    dx = abs(float(l) - float(r)) / 2.0
-    dy = abs(float(t) - float(b)) / 2.0
-
-    # Собираем размеры в параметр span
-    span = "{dx},{dy}".format(**locals())
-
-    return (ll, span)
-
-def geocoder_map(bot, updater):
-    geocoder_uri = geocoder_request_template = "http://geocode-maps.yandex.ru/1.x/"
-    response = requests.get(geocoder_uri, params = {
-        "format": "json",
-        "geocode": updater.message.text
-    })
-
-
-    toponym = response.json()["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-    
-   
-    ll, spn = get_ll_spn(toponym)  
-    # Можно воспользоваться готовой фукнцией,
-    # которую предлагалось сделать на уроках, посвященных HTTP-геокодеру.
-
-    static_api_request = "http://static-maps.yandex.ru/1.x/?ll={ll}&spn={spn}&l=map".format(**locals())
-
-    bot.sendPhoto(
-        updater.message.chat.id,  # Идентификатор чата. Куда посылать картинку.
-        # Ссылка на static API по сути является ссылкой на картинку.
-        static_api_request
-    )                             
-    # Телеграму можно передать прямо ее, не скачивая предварительно карту.
-
-
-def geocoder_sat(bot, updater):
-    pass
-
-
-def geocoder_gip(bot, updater):
-    pass
-
-
 def cinema(bot, update):    #Выдает список кинотеатров города, посредстов поиска в google
     global profile
     global adress  
@@ -179,6 +114,47 @@ def school(bot, update):    #Выдает список школ и учебны�
         update.message.reply_text("Ввойдите, в систему, чтобы воспользоваться этой командой")
     else:
         update.message.reply_text("Поиск по всем школам и учебным заведениям вашего города:\nhttps://www.google.com/search?q=школы+и+учебные+заведения+{}&oq=школы+и+учебные+заведения+{}&aqs=chrome..69i57j0l5.3288j0j7&sourceid=chrome&ie=UTF-8".format(adress, adress))
+        
+        
+def maps(bot, update):    #Выдает карту города города, запросив вид карты (схема, спутник, гибрид)
+    global adress    
+    if adress == None:
+        update.message.reply_text("Ввойдите, в систему, чтобы воспользоваться этой командой")
+        return ConversationHandler.END
+    else:
+        update.message.reply_text("Выберите вид карты", reply_markup=markup_map)
+        return 1
+
+
+def kind(bot, update):
+#    global profile
+#    global adress    
+#    kin = update.message.text
+#    if kin == "Схема":
+#        mapa.setMode('map')
+#        topo = mapa.getObject(adress)
+#        mapa.setCenter(topo.getCoords())
+#        mapa.render()
+#        photo_loader(mapa.render())
+#    elif kin == "Спутник":
+#        mapa.setMode('sat')
+#        topo = mapa.getObject(adress)
+#        mapa.setCenter(topo.getCoords())
+#        mapa.render()
+#        photo_loader(mapa.render())        
+#    elif kin == "Гибрид":
+#        mapa.setMode('hyb')
+#        topo = mapa.getObject(adress)
+#        mapa.setCenter(topo.getCoords())
+#        mapa.render()
+#        photo_loader(mapa.render())        
+#    else:
+#        update.message.reply_text("Выберите вид карты", reply_markup=markup_map)
+#        return 1
+    pass
+
+def photo_loader(bot, updater, mapi):
+    bot.sendPhoto(updater.message.chat.id, mapi)
 
 
 def stop_map(bot, update):
@@ -196,14 +172,9 @@ def stop_start(bot, update):    #останавливает регистраци
 
 def start(bot, update):    #Выдает список кинотеатров города, посредстов поиска в google
     update.message.reply_text("Приветствую!\nЯ буду вашим личным ботом-справочником.")
-    update.message.reply_text("Чтобы сразу узнат все команды, доступные на данном боте, напишите команду /help")
     update.message.reply_text("Войдите в систему или зарегестрируйтесь, если вы с нами в перый раз!", 
                               reply_markup=markup_hello) 
     return 1
-
-
-def check_map(bot, update):
-    pass
 
 
 def check(bot, update):    #Выдает список кинотеатров города, посредстов поиска в google
@@ -226,8 +197,7 @@ def log_out(bot, update):
 def help(bot, update):
     update.message.reply_text("Вот команды, доступные на этом боте")
     update.message.reply_text("/help - вывод списка доступных комманд\n/log_out - выход из системы\n/cinema - бот скидывает ссылку на поиск кинотеатров вашего города в google\n/park - бот скидывает ссылку на поиск парков вашего города в google\n/school - бот скидывает ссылку на поиск школ и учебных заведений вашего города в google")
-    
-    
+    update.message.reply_text("Планировалась команда /map, которая спрашивала у пользователя тип карты и скидывала фото города с, выбранным пользователем, типом, но создатель оказался человеком с руками из одного места, так что, возможно, как-то потом будет\n¯\_(ツ)_/¯")
 def main(updater):    #основная функция бота
     dp = updater.dispatcher
     start_conv = ConversationHandler(
@@ -250,12 +220,9 @@ def main(updater):    #основная функция бота
     )  
     
     map_conv = ConversationHandler(
-        entry_points = [CommandHandler('map', start_map)], 
+        entry_points = [CommandHandler('map', maps)], 
         states={ 
-            1: [MessageHandler(Filters.text, check_map)],
-            2: [MessageHandler(Filters.text, geocoder_map)],
-            3: [MassageHandler(Filters.text, geocoder_sat)],
-            4: [MessageHandler(Filters.text, geocoder_gip)]
+            1: [MessageHandler(Filters.text, kind)]
         },
         fallbacks = [CommandHandler('stop', stop_map)]
         )  
@@ -272,4 +239,3 @@ def main(updater):    #основная функция бота
 
 if __name__ == '__main__':
     setup_proxy_and_start(token=TOKEN, proxy=True)
-
